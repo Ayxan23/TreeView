@@ -63,7 +63,12 @@ export default function TreeView({
                 }
               }}
             >
-              {expandedNodes[node.id] ? "▼" : "▶"} {node.code}. {node.name}
+              {(node.children && node.children.length > 0) || node.parentId == 0
+                ? expandedNodes[node.id]
+                  ? "▼"
+                  : "▶"
+                : "✖"}{" "}
+              {node.code}. {node.name}
             </button>
             {expandedNodes[node.id] && expandedNodes[node.id].length > 0 && (
               <div>{renderTree(expandedNodes[node.id], currentLevel + 1)}</div>
@@ -75,6 +80,6 @@ export default function TreeView({
   };
 
   return (
-    <div>{data.length > 0 ? renderTree(data, level) : <p>Loading...</p>}</div>
+    <div>{data.length > 0 ? renderTree(data, level) : <p className={styles.loading}>Loading...</p>}</div>
   );
 }

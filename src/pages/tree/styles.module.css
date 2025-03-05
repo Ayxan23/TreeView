@@ -22,3 +22,13 @@
   color: rgb(0, 74, 124);
   text-align: left;
 }
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 60px;
+  font-weight: 500;
+  opacity: 0.6;
+  height: 100vh;
+}
