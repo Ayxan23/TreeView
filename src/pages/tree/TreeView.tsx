@@ -23,8 +23,10 @@ export default function TreeView({
   const [expandedNodes, setExpandedNodes] = useState<{
     [key: number]: TreeNode[];
   }>({});
+  const [selectedNode, setSelectedNode] = useState<number | null>(null);
 
   const toggleNode = async (node: TreeNode) => {
+    setSelectedNode(node.id);
     if (expandedNodes[node.id]) {
       setExpandedNodes((prev) => {
         const newState = { ...prev };
@@ -57,11 +59,8 @@ export default function TreeView({
         {nodes.map((node) => (
           <li key={node.id}>
             <button
-              onClick={() => {
-                if (node.children?.length != 0) {
-                  toggleNode(node);
-                }
-              }}
+              onClick={() => node.children?.length != 0 && toggleNode(node)}
+              className={selectedNode === node.id ? styles.selected : ""}
             >
               {(node.children && node.children.length > 0) || node.parentId == 0
                 ? expandedNodes[node.id]
@@ -80,6 +79,12 @@ export default function TreeView({
   };
 
   return (
-    <div>{data.length > 0 ? renderTree(data, level) : <p className={styles.loading}>Loading...</p>}</div>
+    <div>
+      {data.length > 0 ? (
+        renderTree(data, level)
+      ) : (
+        <p className={styles.loading}>Loading...</p>
+      )}
+    </div>
   );
 }
