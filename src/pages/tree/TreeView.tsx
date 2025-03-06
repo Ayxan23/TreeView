@@ -78,9 +78,9 @@ export default function TreeView({
               {(node.children && node.children.length > 0) ||
               node.parentId === 0
                 ? expandedNodes[node.id]
-                  ? "▼"
-                  : "▶"
-                : "X"}{" "}
+                  ? "📂"
+                  : "📁"
+                : "📄"}{" "}
               {node.code} {node.name}
             </button>
             {expandedNodes[node.id] && expandedNodes[node.id].length > 0 && (
