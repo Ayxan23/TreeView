@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "./styles.module.css";
 
-type TreeNode = {
+ type TreeNode = {
   id: number;
   code: string | null;
   name: string;
@@ -9,20 +9,15 @@ type TreeNode = {
   children?: TreeNode[];
 };
 
-type TreeProps = {
+ type TreeProps = {
   data: TreeNode[];
   fetchChildren: (key: string, id: number) => Promise<TreeNode[]>;
   level?: number;
 };
 
-export default function TreeView({
-  data,
-  fetchChildren,
-  level = 0,
-}: TreeProps) {
-  const [expandedNodes, setExpandedNodes] = useState<{
-    [key: number]: TreeNode[];
-  }>({});
+ export default function TreeView({ data, fetchChildren, level = 0 }: TreeProps) {
+  const [expandedNodes, setExpandedNodes] = useState<{ [key: number]: TreeNode[] }>({});
+  const [loadedNodes, setLoadedNodes] = useState<{ [key: number]: TreeNode[] }>({});
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
 
   const toggleNode = async (node: TreeNode) => {
@@ -34,21 +29,18 @@ export default function TreeView({
         return newState;
       });
     } else {
-      if (!node.children || node.children.length === 0) {
+      if (loadedNodes[node.id]) {
+        setExpandedNodes((prev) => ({ ...prev, [node.id]: loadedNodes[node.id] }));
+      } else {
         if (node.code) {
           try {
-            let children: TreeNode[] = [];
-            children = await fetchChildren(node.code, node.id);
+            const children: TreeNode[] = await fetchChildren(node.code, node.id);
             setExpandedNodes((prev) => ({ ...prev, [node.id]: children }));
+            setLoadedNodes((prev) => ({ ...prev, [node.id]: children }));
           } catch (error) {
             console.error("Error fetching children:", error);
           }
         }
-      } else {
-        setExpandedNodes((prev) => ({
-          ...prev,
-          [node.id]: node.children || [],
-        }));
       }
     }
   };
@@ -59,15 +51,14 @@ export default function TreeView({
         {nodes.map((node) => (
           <li key={node.id}>
             <button
-              onClick={() => node.children?.length != 0 && toggleNode(node)}
+              onClick={() => node.children?.length !== 0 && toggleNode(node)}
               className={selectedNode === node.id ? styles.selected : ""}
             >
-              {(node.children && node.children.length > 0) || node.parentId == 0
+              {(node.children && node.children.length > 0) || node.parentId === 0
                 ? expandedNodes[node.id]
                   ? "▼"
                   : "▶"
-                : "✖"}{" "}
-              {node.code}. {node.name}
+                : "X"} {node.code} {node.name}
             </button>
             {expandedNodes[node.id] && expandedNodes[node.id].length > 0 && (
               <div>{renderTree(expandedNodes[node.id], currentLevel + 1)}</div>
